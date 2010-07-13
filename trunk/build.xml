@@ -1,0 +1,108 @@
+<project default="build-and-jar">
+	<property name="src" value="src" />
+	<property name="bin" value="target" />
+	<property name="res" value="res" />
+	<property name="version" value="0.5" />
+	
+	<property name="util-ver" value="0.9" />
+	<property name="sync-ver" value="0.9" />
+	<property name="task-ver" value="0.3" />
+	<property name="msg-ver" value="0.9" />
+	<property name="search-ver" value="0.5" />
+	<property name="cache-ver" value="0.9" />
+	<property name="core-ver" value="0.8" />
+	
+	<property name="swing-task-ver" value="0.9" />
+	<property name="swing-util-ver" value="0.8" />
+	<property name="swing-search-ver" value="0.8" />
+	<property name="swing-dialog-ver" value="0.8" />
+	<property name="swing-ver" value="0.5" />
+	<property name="swing-all-ver" value="0.5" />
+	
+  <target name="compile">
+    <javac srcdir="." />
+  </target>
+	
+	
+	<target name="jar-util" depends="compile">
+		<delete file="${bin}/sglj-util-${util-ver}.jar" />
+		<jar destfile="${bin}/sglj-util-${util-ver}.jar">
+		  <fileset dir="${src}" includes="org/sglj/util/**/*.class" />
+		  <fileset dir="${res}" includes="LICENCE.TXT" />
+		</jar>
+	</target>
+	
+	<target name="jar-sync" depends="compile">
+		<delete file="${bin}/sglj-sync-${sync-ver}.jar" />
+		<jar destfile="${bin}/sglj-sync-${sync-ver}.jar">
+		  <fileset dir="${src}" includes="org/sglj/sync/**/*.class" />
+		  <fileset dir="${res}" includes="LICENCE.TXT" />
+		</jar>
+	</target>
+	
+	<target name="jar-task" depends="compile">
+		<delete file="${bin}/sglj-task-${task-ver}.jar" />
+		<jar destfile="${bin}/sglj-task-${task-ver}.jar">
+		  <fileset dir="${src}" includes="org/sglj/task/**/*.class" />
+		  <fileset dir="${res}" includes="LICENCE.TXT" />
+		</jar>
+	</target>
+	
+  <target name="jar-msg" depends="compile">
+  	<delete file="${bin}/sglj-msg-${msg-ver}.jar" />
+  	<jar destfile="${bin}/sglj-msg-${msg-ver}.jar">
+  		<fileset dir="${src}" includes="org/sglj/msg/**/*.class" />
+  		<fileset dir="${res}" includes="LICENCE.TXT" />
+  	</jar>
+  </target>
+	
+	<target name="jar-search" depends="compile">
+		<delete file="${bin}/sglj-search-${search-ver}.jar" />
+		<jar destfile="${bin}/sglj-search-${search-ver}.jar">
+		  <fileset dir="${src}" includes="org/sglj/search/**/*.class" />
+		  <fileset dir="${res}" includes="LICENCE.TXT" />
+		</jar>
+	</target>
+	
+	<target name="jar-cache" depends="compile">
+		<delete file="${bin}/sglj-cache-${cache-ver}.jar" />
+		<jar destfile="${bin}/sglj-cache-${cache-ver}.jar">
+			<fileset dir="${src}" includes="org/sglj/cache/**/*.class" />
+			<fileset dir="${res}" includes="LICENCE.TXT" />
+		</jar>
+	</target>
+	
+	<target name="jar-core" depends="compile">
+		<delete file="${bin}/sglj-core-${core-ver}.jar" />
+		<jar destfile="${bin}/sglj-core-${core-ver}.jar">
+			<fileset dir="${src}" includes="org/sglj/**/*.class" 
+			  			 excludes="org/sglj/swing/**/*.class" />
+			<fileset dir="${res}" includes="LICENCE.TXT" />
+		</jar>
+	</target>
+	
+	<target name="jar-swing-all" depends="compile">
+		<delete file="${bin}/sglj-swing-all-${swing-all-ver}.jar" />
+		<jar destfile="${bin}/sglj-swing-all-${swing-all-ver}.jar">
+			<fileset dir="${src}" includes="org/sglj/swing/**/*.class" />
+			<fileset dir="${res}" includes="LICENCE.TXT" />
+		</jar>
+	</target>
+	
+  <target name="jar-all" depends="compile">
+  	<delete file="${bin}/sglj-${version}.jar" />
+  	<jar destfile="${bin}/sglj-${version}.jar">
+  		<fileset dir="${src}" includes="**/*.class" />
+  		<fileset dir="${res}" includes="LICENCE.TXT" />
+  	</jar>
+  </target>
+	
+  <target name="cleanup">
+    <delete>
+			<fileset dir="." includes="**/*.class"/>
+    		<fileset dir="${bin}" includes="*.jar"/>
+		</delete>
+  </target>
+	
+  <target name="build-and-jar" depends="compile,jar-all" />
+</project>
