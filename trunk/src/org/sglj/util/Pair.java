@@ -29,15 +29,23 @@ package org.sglj.util;
  */
 public class Pair<T1, T2> implements Comparable< Pair<T1, T2> > {
 	
-	public T1 first;
-	public T2 second;
-	
-	public Pair() {
-	}
+	private T1 first;
+	private T2 second;
 	
 	public Pair(T1 first, T2 second) {
 		this.first = first;
 		this.second = second;
+	}
+	
+	Pair() {
+	}
+	
+	public T1 first() {
+		return first;
+	}
+	
+	public T2 second() {
+		return second;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -65,6 +73,14 @@ public class Pair<T1, T2> implements Comparable< Pair<T1, T2> > {
 	@Override
 	public int hashCode() {
 		return first.hashCode() ^ (second.hashCode()<<16);
+	}
+	
+	void setFirst(T1 first) {
+		this.first = first;
+	}
+	
+	void setSecond(T2 second) {
+		this.second = second;
 	}
 	
 }
