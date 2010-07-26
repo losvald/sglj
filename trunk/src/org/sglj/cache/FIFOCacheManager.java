@@ -49,7 +49,7 @@ extends AbstractCacheManager<I, C> {
 	}
 
 	public void add(I cacheInfo, C cacheable, int whereToPersist) {
-		if((whereToPersist | PERSIST_IN_MEMORY) != 0) {
+		if((whereToPersist & PERSIST_IN_MEMORY) != 0) {
 			long size = cacheInfo.approximateSize();
 			if(size <= maxMemory) {
 				synchronized (memory) {

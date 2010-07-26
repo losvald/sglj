@@ -221,8 +221,7 @@ implements SingleTaskView, SingleTaskModelListener {
 		Task task = e.getTask();
 		if(task == null)
 			return ;
-		if(task == activeTask
-				|| activeTask == null && task != null) {
+		if(task == activeTask || activeTask == null) {
 			if(task.getState() == Task.TaskState.STARTED) {
 //				System.out.println("Updating ActiveTaskViewImpl: task is null?"
 //						+ (task == null));
@@ -238,8 +237,7 @@ implements SingleTaskView, SingleTaskModelListener {
 		Task task = e.getTask();
 		if(task == null)
 			return ;
-		if(task == activeTask
-				|| activeTask == null && task != null)
+		if(task == activeTask || activeTask == null)
 			updateStatus(task);
 	}
 
@@ -386,7 +384,7 @@ implements SingleTaskView, SingleTaskModelListener {
 			if(task != null && task.getState() == Task.TaskState.STARTED)
 				break;
 			//if task is somehow null or is not started yet, remove it
-			displayCycle.poll();
+			displayCycle.remove();
 		}
 		if(displayCycle.isEmpty())
 			task = null;

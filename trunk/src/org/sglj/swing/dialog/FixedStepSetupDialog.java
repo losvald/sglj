@@ -24,6 +24,7 @@ package org.sglj.swing.dialog;
 
 import java.awt.Frame;
 import java.nio.channels.IllegalSelectorException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,11 +50,20 @@ public abstract class FixedStepSetupDialog extends SetupDialog {
 	}
 
 	/**
+	 * Returns the step at the specified index.
+	 * @param index 0-based index
+	 * @return the step
+	 */
+	public SetupStep getStep(int index) {
+		return steps[index];
+	}
+	
+	/**
 	 * Returns steps of the dialog.
 	 * @return array of steps
 	 */
 	public SetupStep[] getSteps() {
-		return steps;
+		return Arrays.copyOf(steps, steps.length);
 	}
 	
 	/**

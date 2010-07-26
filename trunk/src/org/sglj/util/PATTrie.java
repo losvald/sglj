@@ -166,7 +166,7 @@ public class PATTrie<E> {
 		
 		String s = prefix.substring(ind);
 		int diffInd = getDifferenceIndex(subtree.edge, s);
-		//ako jedan nije prefix drugog, onda nema rezultata
+		//if one is not the prefix of another one, there are no results
 		if(diffInd < s.length() && diffInd < subtree.edge.length()) return null;
 		
 //		System.out.println("->" + subtree.edge + "\t" + subtree.prefixCount);
@@ -185,7 +185,7 @@ public class PATTrie<E> {
 		
 		String s = prefix.substring(ind);
 		int diffInd = getDifferenceIndex(subtree.edge, s);
-		//ako jedan nije prefix drugog, onda nema rezultata
+		//if one is not the prefix of another one, there are no results
 		if(diffInd < s.length() && diffInd < subtree.edge.length()) return false;
 			
 		return findPrefix(prefix, ind+diffInd, subtree, added);
@@ -227,7 +227,7 @@ public class PATTrie<E> {
 		
 		String s = key.substring(ind);
 		int diffInd = getDifferenceIndex(subtree.edge, s);
-		//ako jedan nije prefix drugog, onda nema rezultata
+		//if one is not the prefix of another one, there are no results
 		if(diffInd < s.length() && diffInd < subtree.edge.length()) return false;
 		
 //		System.out.println("->" + subtree.edge + "\t" + subtree.prefixCount);
@@ -301,7 +301,7 @@ public class PATTrie<E> {
 			final boolean addOrRemove, final Collection<E> addedOrRemoved) {
 		boolean ret = false;
 		for(Node curr = lower; curr != higher && curr != root; curr = curr.parent) {
-			//dodaj/izbrisi sve iz ostalih podstabala
+			//add/remove all from other subtrees
 			for(Node sibling : curr.parent.next.values()) {
 				if(sibling != curr) {
 //					int oldCnt = (result != null ? result.size() : 0);
@@ -380,7 +380,7 @@ public class PATTrie<E> {
 			return false;
 		}
 		
-		//normalni slucajevi (currNode != null && lastNode != null)
+		//trivial cases (currNode != null && lastNode != null)
 		
 //		System.out.println("lastNode data: " + (lastNode == root ? "(root)" : 
 //			(lastNode == null ? "(lastNode == null)" : lastNode.data)));
@@ -390,23 +390,26 @@ public class PATTrie<E> {
 		boolean isDescendant = currPrefix.startsWith(lastPrefix);
 		boolean	isAncestor = lastPrefix.startsWith(currPrefix);
 		
-		//ako sadasnji i prosli predstavljaju isto podstablo, nema promjena
-		if(lastNode == currNode) return true;
+		//if current and last node represent the same subtree, no changes
+		if(lastNode == currNode) 
+			return true;
 		
 		boolean ret;
 		
-		//ako su disjunktni onda vrati novi skup
+		//if they are disjunctive, return a new set
 		if(!isDescendant && !isAncestor) {
 			findPrefix(currPrefix, 0, root, added);
 			ret = false;
 		}
-		//ako je novi potomak onda se spusti do njega i izbrisi ove "sa strane"
+		//if this node is a descendant, descend and remove results
+		//from other subtrees on the route
 		else if(isDescendant) {
 			System.out.println("DESCENDANT: " + currPrefix.substring(lastPrefix.length()));
 			descend(lastNode, currNode, removed);
 			ret = true;
 		}
-		//ako je predak, onda se popni do njega i pokupi ove "sa strane"
+		//if this is an ancestor, ascend and add results from the subtrees
+		//on the route
 		else {
 			System.out.println("ASCENDANT");
 			ascend(lastNode, currNode, added);
@@ -502,7 +505,7 @@ public class PATTrie<E> {
 		 * (but not from its children).
 		 */
 		public void destroy() {
-			//TODO mozda treba unistit i veze od djece prema njemu??
+			// TODO maybe links from children to this node should be destroyed??
 //			System.out.println("Destroy: " + edge);
 			--nodeCount;
 			if(this.parent != null) {
@@ -513,7 +516,8 @@ public class PATTrie<E> {
 				this.parent = null;
 			}
 			edge = null;
-			//da ne mucim garbage collector
+			//
+			//let GC deallocate memory
 			purgeNext();
 			purgeData();
 		}

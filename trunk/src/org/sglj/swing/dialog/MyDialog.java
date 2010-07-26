@@ -113,14 +113,14 @@ public abstract class MyDialog extends JDialog implements PropertyChangeListener
 	}
 
 	public void setOptionPane(JOptionPane optionPane) {
-		if(optionPane == null) return ; //ako je null, ignoriraj
-		//izbrisi sve vezano uz stari optionPane
+		if(optionPane == null) return ; //if null, ignore
+		//remove all connected to the old pane
 		if(this.optionPane != null) {
 			getContentPane().remove(this.optionPane);
 			this.optionPane.removePropertyChangeListener(this);
 		}
 		
-		//postavi novi
+		//set the new one
 		this.optionPane = optionPane;
 		getContentPane().addContainerListener(recursiveContainerListener);
 		getContentPane().add(optionPane);
@@ -133,7 +133,8 @@ public abstract class MyDialog extends JDialog implements PropertyChangeListener
 		addWindowListener(new WindowAdapter() {
 	        	@Override
 	        	public void windowClosing(java.awt.event.WindowEvent e) {
-	        		MyDialog.this.optionPane.setValue(new Integer(JOptionPane.CLOSED_OPTION));
+	        		MyDialog.this.optionPane.setValue(
+	        				Integer.valueOf(JOptionPane.CLOSED_OPTION));
 	        	};
 		});
 		
@@ -219,14 +220,14 @@ public abstract class MyDialog extends JDialog implements PropertyChangeListener
 					- getSize().width)/2;
 			int y = (2*invokerFrame.getY() + invokerFrame.getHeight()
 					- getSize().height)/2;
-			//ako bi bio potupno izvan ekrena, vrati ga na rub
+			//if it would be completely out of the screen, move it to the edge
 			if(x < 0) x = 0;
 			else if(x >= screenWidth)
 				x = (int) (screenWidth - getWidth() + eps);
 			if(y < 0) y = 0;
 			else if(y >= screenHeigth)
 				y = (int) (screenHeigth - getHeight() + eps);
-			//postavi po mogucnosti u sredinu tj. na rub ako bi bio izvan
+			//move it to the center if possible (or at least to the edge)
 			setLocation(x, y);
 		} else { //otherwise, move it to center
 			int x = (int) (screenWidth - getWidth() + eps)/2;

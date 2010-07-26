@@ -21,6 +21,8 @@
 
 package org.sglj.swing.task;
 
+import java.io.Serializable;
+
 import org.sglj.task.Task;
 import org.sglj.task.TaskEvent;
 import org.sglj.task.TaskListener;
@@ -32,7 +34,7 @@ import org.sglj.task.TaskManager;
  * @author Leo Osvald
  * @version 1.05
  */
-public interface SingleTaskModel {
+public interface SingleTaskModel extends Serializable {
 	
 	/**
 	 * Sets currently displayed task.

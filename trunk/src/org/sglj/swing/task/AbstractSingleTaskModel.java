@@ -35,6 +35,8 @@ import org.sglj.task.TaskEvent;
  */
 public abstract class AbstractSingleTaskModel implements SingleTaskModel {
 	
+	private static final long serialVersionUID = 1L;
+	
 	private EventListenerList listeners = new EventListenerList();
 	private TaskEvent event;
 	

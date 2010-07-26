@@ -28,7 +28,7 @@ import javax.swing.event.EventListenerList;
  * This implementation is thread-safe.
  * 
  * @author Leo Osvald
- * @version 1.02
+ * @version 1.03
  */
 public abstract class AbstractTaskManager implements TaskManager {
 	
@@ -46,21 +46,22 @@ public abstract class AbstractTaskManager implements TaskManager {
 	}
 	
 	protected void fireTaskAdded(Task task) {
-		Object[] listeners = this.listeners.getListenerList();
-	    for (int i = listeners.length-2; i>=0; i-=2) {
-	         if (listeners[i]==TaskManagerListener.class) {
-	             if (event == null)
-	                 event = new TaskEvent(this);
-	             event.setTask(task);
-	             ((TaskManagerListener)listeners[i+1]).taskAdded(event);
-	         }
-	     }
+		synchronized (this.listeners) {
+			Object[] listeners = this.listeners.getListenerList();
+		    for (int i = listeners.length-2; i>=0; i-=2) {
+		         if (listeners[i]==TaskManagerListener.class) {
+		             if (event == null)
+		                 event = new TaskEvent(this);
+		             event.setTask(task);
+		             ((TaskManagerListener)listeners[i+1]).taskAdded(event);
+		         }
+		     }
+		}
 	}
 	
 	protected void fireTaskRemoved(Task task) {
-		Object[] listeners = null;
 		synchronized (this.listeners) {
-			listeners = this.listeners.getListenerList();
+			Object[] listeners = this.listeners.getListenerList();
 			for (int i = listeners.length-2; i>=0; i-=2) {
 		         if (listeners[i]==TaskManagerListener.class) {
 		             if (event == null)
@@ -73,9 +74,8 @@ public abstract class AbstractTaskManager implements TaskManager {
 	}
 	
 	protected void fireTaskStateChanged(Task task) {
-		Object[] listeners = null;
 		synchronized (this.listeners) {
-			listeners = this.listeners.getListenerList();
+			Object[] listeners = this.listeners.getListenerList();
 		    for (int i = listeners.length-2; i>=0; i-=2) {
 		         if (listeners[i]==TaskManagerListener.class) {
 		             if (event == null)
@@ -88,9 +88,8 @@ public abstract class AbstractTaskManager implements TaskManager {
 	}
 	
 	protected void fireTaskStatusChanged(Task task) {
-		Object[] listeners = null;
 		synchronized (this.listeners) {
-			listeners = this.listeners.getListenerList();
+			Object[] listeners = this.listeners.getListenerList();
 		    for (int i = listeners.length-2; i>=0; i-=2) {
 		         if (listeners[i]==TaskManagerListener.class) {
 		             if (event == null)
@@ -103,9 +102,8 @@ public abstract class AbstractTaskManager implements TaskManager {
 	}
 	
 	protected void fireTaskUpdated(Task task) {
-		Object[] listeners = null;
 		synchronized (this.listeners) {
-			listeners = this.listeners.getListenerList();
+			Object[] listeners = this.listeners.getListenerList();
 		    for (int i = listeners.length-2; i>=0; i-=2) {
 		         if (listeners[i]==TaskManagerListener.class) {
 		             if (event == null)

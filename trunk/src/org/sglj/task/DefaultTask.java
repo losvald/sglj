@@ -75,9 +75,9 @@ public class DefaultTask extends AbstractTask {
 	 * @param name new name of the task
 	 */
 	protected void setName(String name) {
-		if(this.name == null && name != null
-				|| this.name != null && name == null
-				|| !this.name.equals(name)) {
+		if((this.name == null ^ name == null)
+				|| (this.name != null && name != null 
+				&& !this.name.equals(name))) {
 			this.name = name;
 			fireTaskUpdated();
 		}

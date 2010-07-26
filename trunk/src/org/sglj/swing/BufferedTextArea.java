@@ -55,7 +55,8 @@ public class BufferedTextArea extends JTextArea {
 	private int bufferSize = DEFAULT_BUFFER_SIZE;
 	private int charCount = 0;
 	
-	private final DocumentListener docListener = new MyDocumentListener();
+	private final transient DocumentListener docListener 
+	= new MyDocumentListener();
 	
 	private static final int DEFAULT_BUFFER_SIZE = 10000;
 	

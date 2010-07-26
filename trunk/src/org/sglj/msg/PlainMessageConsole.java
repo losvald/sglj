@@ -43,12 +43,7 @@ public class PlainMessageConsole implements MessageConsole {
 	
 	private final Vector<MessageConsoleView> views = new Vector<MessageConsoleView>();
 	
-	private MessageFilter msgFilter = new MessageFilter() {
-		@Override
-		public boolean accept(Message message) {
-			return true;
-		}
-	};
+	private MessageFilter msgFilter = new DefaultMessageFilter();
 	
 	private final Vector<Message> buffer = new Vector<Message>();
 	
@@ -93,7 +88,7 @@ public class PlainMessageConsole implements MessageConsole {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void clear() {
+	public synchronized void clear() {
 		buffer.clear();
 		messageCount = 0;
 		informRefresh();
@@ -112,7 +107,7 @@ public class PlainMessageConsole implements MessageConsole {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int getMessageCapacity() {
+	public synchronized int getMessageCapacity() {
 		return messageCapacity;
 	}
 	
@@ -120,7 +115,7 @@ public class PlainMessageConsole implements MessageConsole {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int getMessageCount() {
+	public synchronized int getMessageCount() {
 		return buffer.size();
 	}
 
@@ -136,7 +131,7 @@ public class PlainMessageConsole implements MessageConsole {
 	 * {@inheritDoc}
 	 */
 	@Override
-	synchronized public List<Message> getMessages() {
+	public synchronized List<Message> getMessages() {
 		//TODO ovo treba pametnije izvest mozda
 		return new ArrayList<Message>(buffer);
 	}
@@ -145,7 +140,7 @@ public class PlainMessageConsole implements MessageConsole {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int getSize() {
+	public synchronized int getSize() {
 		return charCount;
 	}
 	
@@ -154,7 +149,7 @@ public class PlainMessageConsole implements MessageConsole {
 	 * Vanjsko pozivanje je zabranjeno jer poruka ne prolazi kroz filter.
 	 */
 	@Override
-	synchronized public void messageReceived(Message message) {
+	public synchronized void messageReceived(Message message) {
 		isMessagePending = false;
 		if(!msgFilter.accept(message)) return ;
 		
@@ -220,7 +215,7 @@ public class PlainMessageConsole implements MessageConsole {
 	 * {@inheritDoc}
 	 */
 	@Override
-	synchronized public MessageConsole print(String s) {
+	public synchronized MessageConsole print(String s) {
 		if(!isMessagePending) beginMessage();
 		currMessage.append(s);
 		return this;
@@ -230,7 +225,7 @@ public class PlainMessageConsole implements MessageConsole {
 	 * {@inheritDoc}
 	 */
 	@Override
-	synchronized public boolean publish(MessageType type) {
+	public synchronized boolean publish(MessageType type) {
 		return msgPublisher.publish(type);
 	}
 
@@ -246,7 +241,7 @@ public class PlainMessageConsole implements MessageConsole {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setCharCapacity(int maximumChars) {
+	public synchronized void setCharCapacity(int maximumChars) {
 		this.charCapacity = maximumChars;
 	}
 
@@ -254,7 +249,7 @@ public class PlainMessageConsole implements MessageConsole {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setMessageCapacity(int maximumMessages) {
+	public synchronized void setMessageCapacity(int maximumMessages) {
 		this.messageCapacity = maximumMessages;
 	}
 
@@ -278,23 +273,30 @@ public class PlainMessageConsole implements MessageConsole {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int getBufferSize(MessageType type) {
-		return -1;
+	public synchronized int getBufferSize(MessageType type) {
+		return -1; //FIXME
 	}
 	
-	synchronized private void beginMessage() {
+	private synchronized void beginMessage() {
 		isMessagePending = true;
 		currMessage.delete(0, currMessage.length());
 	}
 	
-	synchronized private void informRefresh() {
+	private synchronized void informRefresh() {
 		for(int i = 0; i < views.size(); ++i)
 			views.get(i).refresh(this);
 	}
 	
-	synchronized private void informReceived(Message message) {
+	private synchronized void informReceived(Message message) {
 		for(int i = 0; i < views.size(); ++i)
 			views.get(i).messageReceived(message);
 	}
-
+	
+	private static class DefaultMessageFilter implements MessageFilter {
+		
+		@Override
+		public boolean accept(Message message) {
+			return true;
+		}
+	}
 }

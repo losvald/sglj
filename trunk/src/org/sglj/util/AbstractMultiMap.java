@@ -21,6 +21,7 @@
 
 package org.sglj.util;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,16 +29,24 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Abstraktna implementacija sucelja {@link MultiMap}
+ * Abstract implementation of the {@link MultiMap} interface.<br>
+ * Multiple values associated to the same key are stored using
+ * the {@link HashSet} class. Therefore, values are compared
+ * using their {@link #hashCode()} and {@link #equals(Object)} method
+ * which means that no two distinct values can be mapped to the same key.<br>
+ * 
+ * @param <K> type of the key
+ * @param <V> type of values stored by the map
+ * @param <M> type of the underlying map which this multimap uses
  * 
  * @author Leo Osvald
- * @param <K> tip kljuca
- * @param <V> tip vrijednosti
- * @param <M> tip mape pomocu koje je ostvarena ova multimapa
+ * @version 1.0
  */
 public class AbstractMultiMap<K, V, M extends Map<K, Set<V>>> 
-implements MultiMap<K, V> {
+implements MultiMap<K, V>, Serializable {
 
+	private static final long serialVersionUID = 1285863430479515409L;
+	
 	private int size;
 	private final Map<K, Set<V>> map;
 	

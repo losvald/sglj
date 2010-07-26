@@ -297,30 +297,53 @@ RefreshListener {
 				ex.printStackTrace();
 			}
 		}
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result
+					+ ((refreshable == null) ? 0 : refreshable.hashCode());
+			return result;
+		}
 
 		@Override
 		public boolean equals(Object obj) {
-			return refreshable.equals(obj);
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (!(obj instanceof RefreshTimerTask))
+				return false;
+			RefreshTimerTask other = (RefreshTimerTask) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (refreshable == null) {
+				if (other.refreshable != null)
+					return false;
+			} else if (!refreshable.equals(other.refreshable))
+				return false;
+			return true;
 		}
 
-		@Override
-		public int hashCode() {
-			return refreshable.hashCode();
-		}
-		
 		public Refreshable refreshable() {
 			return refreshable;
 		}
 
+		private AbstractRefreshManager getOuterType() {
+			return AbstractRefreshManager.this;
+		}
+
 	}
 
-	protected class RefreshTimer extends Timer {
+	protected static class RefreshTimer extends Timer {
 		public RefreshTimer() {
 			super(true);
 		}
 		
 		/**
-		 * Ne radi nista.
+		 * Does nothing.
 		 */
 		@Override
 		public void cancel() {

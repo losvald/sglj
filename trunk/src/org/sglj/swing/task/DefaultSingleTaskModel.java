@@ -35,6 +35,8 @@ import org.sglj.task.TaskManagerListener;
  */
 public class DefaultSingleTaskModel extends AbstractSingleTaskModel {
 
+	private static final long serialVersionUID = 1L;
+	
 	private Task task;
 	private TaskListener listener;
 	private TaskManagerListener taskMgrListener;
@@ -76,7 +78,7 @@ public class DefaultSingleTaskModel extends AbstractSingleTaskModel {
 			task.addTaskListener(listener);
 		}
 		else {
-			fireTaskUpdated(task);
+			fireTaskUpdated(task); // XXX ???
 		}
 		this.task = task;
 		//if task actually changed

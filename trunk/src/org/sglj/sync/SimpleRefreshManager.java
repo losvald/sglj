@@ -44,7 +44,7 @@ package org.sglj.sync;
  * </ul></p>
  * 
  * @author Leo Osvald
- * @version 0.81
+ * @version 0.82
  */
 public class SimpleRefreshManager extends AbstractRefreshManager {
 
@@ -94,16 +94,18 @@ public class SimpleRefreshManager extends AbstractRefreshManager {
 		if(!isAutoRefreshEnabled())
 			return;
 		
+		Refreshable refreshable = e.getRefreshable();
+		
 		//just in case, see if refresh task is already scheduled
 		//and try to cancel it
-		RefreshTimerTask task = timerTasks.get(e.getRefreshable());
+		RefreshTimerTask task = timerTasks.get(refreshable);
 		if(task != null) {
 			task.cancel();
 		}
-		if(!task.refreshable().isRefreshInProgress()) {
+		if(!refreshable.isRefreshInProgress()) {
 			synchronized (scheduleMutex) {
-				timerTasks.put(task.refreshable(), 
-						scheduleForAutoRefresh(task.refreshable()));
+				timerTasks.put(refreshable, 
+						scheduleForAutoRefresh(refreshable));
 			}
 		} else {
 //			System.err.println("Refresh is already in progress"

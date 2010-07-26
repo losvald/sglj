@@ -40,7 +40,7 @@ implements DeterminateTask {
 	private volatile double progress;
 	private volatile double sensitivity = DEFAULT_SENSITIVITY;
 	
-	protected static double DEFAULT_SENSITIVITY = 0.005;
+	protected static final double DEFAULT_SENSITIVITY = 0.005;
 	
 	@Override
 	public void addDeterminedTaskListener(DeterminateTaskListener l) {
@@ -91,9 +91,8 @@ implements DeterminateTask {
 	}
 	
 	protected synchronized void fireTaskProgressChanged() {
-		Object[] listeners;
 		synchronized (this.listeners) {
-			listeners = this.listeners.getListenerList();
+			Object[] listeners = this.listeners.getListenerList();
 			for (int i = listeners.length-2; i>=0; i-=2) {
 				if (listeners[i]==TaskProgressListener.class) {
 					if (event == null)

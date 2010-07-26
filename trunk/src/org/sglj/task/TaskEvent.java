@@ -31,7 +31,7 @@ import java.util.EventObject;
  * @version 1.11
  */
 public class TaskEvent extends EventObject {
-	private Task task;
+	private transient Task task;
 	
 	private static final long serialVersionUID = 1L;
 	

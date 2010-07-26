@@ -22,6 +22,7 @@
 package org.sglj.search;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,7 +50,10 @@ import org.sglj.util.SetUtils;
  * @param <E> type of data which is incrementally searched
  */
 
-public abstract class IncrementalSearchModel<E> implements SortedSet<E> {
+public abstract class IncrementalSearchModel<E> implements SortedSet<E>,
+Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	protected PATTrie<E> trie;
 	protected TreeSet<E> addedResults;

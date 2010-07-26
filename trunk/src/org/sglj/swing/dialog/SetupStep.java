@@ -22,6 +22,8 @@
 package org.sglj.swing.dialog;
 
 
+import java.io.Serializable;
+
 import javax.swing.JPanel;
 
 import org.sglj.swing.util.FormData;
@@ -35,9 +37,9 @@ import org.sglj.swing.util.FormData;
  * 
  * @see SetupDialog
  * @author Leo Osvald
- * @version 0.6
+ * @version 0.61
  */
-public abstract class SetupStep {
+public abstract class SetupStep implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private SetupDialog setupDialog;

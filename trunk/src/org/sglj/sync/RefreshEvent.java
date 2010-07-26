@@ -25,7 +25,7 @@ import java.util.EventObject;
 
 public class RefreshEvent extends EventObject {
 	
-	private Refreshable refreshable;
+	private transient Refreshable refreshable;
 	private static final long serialVersionUID = 1L;
 	
 	/**
