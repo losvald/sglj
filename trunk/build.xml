@@ -1,5 +1,5 @@
 <project default="build-and-jar">
-	<property name="src" value="src" />
+	<property name="src/main/java" value="src" />
 	<property name="bin" value="target" />
 	<property name="res" value="res" />
 	<property name="version" value="0.5" />
