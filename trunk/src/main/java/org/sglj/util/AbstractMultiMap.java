@@ -47,6 +47,8 @@ implements MultiMap<K, V>, Serializable {
 
 	private static final long serialVersionUID = 1285863430479515409L;
 	
+	protected static final int DEFAULT_INNER_SET_INITIAL_CAPACITY = 4;
+	
 	private int size;
 	private final Map<K, Set<V>> map;
 	
@@ -134,7 +136,7 @@ implements MultiMap<K, V>, Serializable {
 			map.get(key).add(value);
 			return value;
 		} else {
-			map.put(key, createInnerSet(value));
+			map.put(key, createInnerSet(value, initialSetCapacity()));
 			return null;
 		}
 	}
@@ -174,8 +176,12 @@ implements MultiMap<K, V>, Serializable {
 		return vals;
 	}
 	
-	protected Set<V> createInnerSet(V value) {
-		return new InnerSet(value);
+	protected Set<V> createInnerSet(V value, int initialCapacity) {
+		return new InnerSet(value, initialCapacity);
+	}
+	
+	protected int initialSetCapacity() {
+		return DEFAULT_INNER_SET_INITIAL_CAPACITY;
 	}
 	
 	protected V firstVal(Set<V> set) {
@@ -208,7 +214,8 @@ implements MultiMap<K, V>, Serializable {
 
 		private static final long serialVersionUID = -7694980022010327893L;
 		
-		public InnerSet(V value) {
+		public InnerSet(V value, int initialCapacity) {
+			super(initialCapacity);
 			add(value);
 		}
 		

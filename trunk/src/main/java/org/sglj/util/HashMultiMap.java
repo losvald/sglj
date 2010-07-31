@@ -36,6 +36,8 @@ import java.util.Set;
  */
 public class HashMultiMap<K, V> extends AbstractMultiMap<K, V, HashMap<K,Set<V>>> {
 	
+	private static final long serialVersionUID = 1L;
+	
 	public static final float DEFAULT_LOAD_FACTOR = 0.75f;
 	
 	@SuppressWarnings("unchecked")
