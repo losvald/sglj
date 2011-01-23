@@ -27,9 +27,9 @@ import java.util.RandomAccess;
 /**
  * 
  * @author Leo Osvald
- * @version 0.01
+ * @version 0.02
  * 
- * @param <E>
+ * @param <E> the type of elements held in this collection
  */
 public class BucketList<E> extends AbstractList<E>
 implements RandomAccess {
@@ -61,7 +61,6 @@ implements RandomAccess {
 		// [2^(n-1)+1, 2^(n+1)+1] -> n
 		--numElements;
 		bucketSizeLog = (log2(numElements) >>> 1);
-		System.out.println("log = "+bucketSizeLog);
 		
 		// determine the number of buckets
 		b = new RandomAccessDeque[2 << bucketSizeLog];
@@ -70,13 +69,10 @@ implements RandomAccess {
 	
 	@SuppressWarnings("unchecked")
 	private void expand() {
-		System.out.println("Size "+size());
 		RandomAccessDeque<E>[] newArr 
 		= new RandomAccessDeque[bucketCount << 1];
 		bucketCount >>>= 1;
 		++bucketSizeLog;
-		System.out.println("Expand "+(bucketCount << bucketSizeLog));
-		System.out.println("Bucket size "+(1 << bucketSizeLog));
 		b[0].addAll(b[1]);
 		b[1].clear();
 		newArr[0] = b[0];

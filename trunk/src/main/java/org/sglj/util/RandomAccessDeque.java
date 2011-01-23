@@ -17,6 +17,39 @@
  * 
  * You should have received a copy of the GNU Lesser General Public License
  */
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the LICENSE file that accompanied this code.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
+ * CA 95054 USA or visit www.sun.com if you need additional information or
+ * have any questions.
+ */
+
+/*
+ * This file is available under and governed by the GNU General Public
+ * License version 2 only, as published by the Free Software Foundation.
+ * However, the following notice accompanied the original version of this
+ * file:
+ *
+ * Written by Josh Bloch of Google Inc. and released to the public domain,
+ * as explained at http://creativecommons.org/licenses/publicdomain.
+ */
 
 package org.sglj.util;
 
@@ -37,7 +70,7 @@ import java.util.RandomAccess;
 
 /**
  * 
- * @author Leo Osvald
+ * @author Josh Bloch and Doug Lea (modified by Leo Osvald)
  * @version 0.01
  * 
  * @param <E>
@@ -82,7 +115,8 @@ implements DequeList<E>, RandomAccess, Cloneable, Serializable {
      *
      * @param numElements  the number of elements to hold
      */
-    private void allocateElements(int numElements) {
+    @SuppressWarnings("unchecked")
+	private void allocateElements(int numElements) {
         int initialCapacity = MIN_INITIAL_CAPACITY;
         // Find the best power of two to hold elements.
         // Tests "<=" because arrays aren't kept full.
@@ -105,7 +139,8 @@ implements DequeList<E>, RandomAccess, Cloneable, Serializable {
      * Double the capacity of this deque.  Call only when full, i.e.,
      * when head and tail have wrapped around to become equal.
      */
-    private void doubleCapacity() {
+    @SuppressWarnings("unchecked")
+	private void doubleCapacity() {
         assert head == tail;
         int p = head;
         int n = elements.length;
@@ -754,7 +789,8 @@ implements DequeList<E>, RandomAccess, Cloneable, Serializable {
      *         this deque
      * @throws NullPointerException if the specified array is null
      */
-    public <T> T[] toArray(T[] a) {
+    @SuppressWarnings("unchecked")
+	public <T> T[] toArray(T[] a) {
         int size = size();
         if (a.length < size)
             a = (T[])java.lang.reflect.Array.newInstance(
@@ -774,7 +810,8 @@ implements DequeList<E>, RandomAccess, Cloneable, Serializable {
      */
     public RandomAccessDeque<E> clone() {
         try {
-            RandomAccessDeque<E> result = (RandomAccessDeque<E>) super.clone();
+            @SuppressWarnings("unchecked")
+			RandomAccessDeque<E> result = (RandomAccessDeque<E>) super.clone();
             result.elements = Arrays.copyOf(elements, elements.length);
             return result;
 
@@ -810,7 +847,8 @@ implements DequeList<E>, RandomAccess, Cloneable, Serializable {
     /**
      * Deserialize this deque.
      */
-    private void readObject(ObjectInputStream s)
+    @SuppressWarnings("unchecked")
+	private void readObject(ObjectInputStream s)
             throws IOException, ClassNotFoundException {
         s.defaultReadObject();
 
