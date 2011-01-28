@@ -178,11 +178,10 @@ implements RandomAccess {
 	
 	@Override
 	public int hashCode() {
-		final int PRIME = 31;
-		int ret = 0;
+		int ret = 1;
 		for (int i = size() - 1; i >= 0; --i) {
 			E e = get(i);
-			ret = ret * PRIME + (e != null ? e.hashCode() : 0);
+			ret = ret * 31 + (e != null ? e.hashCode() : 0);
 		}
 		return ret;
 	}
