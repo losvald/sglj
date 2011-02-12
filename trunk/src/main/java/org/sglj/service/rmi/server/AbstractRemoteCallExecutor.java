@@ -68,7 +68,7 @@ implements RemoteCallExecutor<S, T> {
 			Throwable cause = e.getCause();
 			if (cause instanceof RemoteCallException) { 
 				return new RemoteCallResult(((RemoteCallException) cause)
-						.getExceptionCode());
+						.getExceptionCode().byteValue());
 			}
 			return new RemoteCallResult(BasicRemoteServiceErrors.INVALID_DATA_SENT);
 		} catch (Exception e) {
@@ -86,7 +86,7 @@ implements RemoteCallExecutor<S, T> {
 			String methodName, Object... args) {
 		Class<?>[] paramTypes = new Class<?>[args == null ? 0 : args.length];
 		for(int i = 0; i < paramTypes.length; ++i)
-			paramTypes[i] = args[i].getClass();
+			paramTypes[i] = (args[i] != null ? args[i].getClass() : null);
 		
 		try {
 			Method m = MethodUtils.getMatchingAccessibleMethod(
@@ -116,7 +116,7 @@ implements RemoteCallExecutor<S, T> {
 			Throwable cause = e.getCause();
 			if (cause instanceof RemoteCallException) { 
 				return new RemoteCallResult(((RemoteCallException) cause)
-						.getExceptionCode());
+						.getExceptionCode().byteValue());
 			}
 			return new RemoteCallResult(BasicRemoteServiceErrors.INVALID_DATA_SENT);
 		} catch (Exception e) {
