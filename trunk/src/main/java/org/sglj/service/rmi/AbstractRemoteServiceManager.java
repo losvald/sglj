@@ -57,7 +57,7 @@ implements RemoteServiceManager<T> {
 	 * @throws IllegalArgumentException if the contract defined in 
 	 * the {@link RemoteServiceManager} interface is broken.
 	 */
-	public AbstractRemoteServiceManager(T... remoteServices) 
+	public <T2 extends T> AbstractRemoteServiceManager(T2... remoteServices) 
 	throws IllegalArgumentException {
 		Validate.noNullElements(remoteServices, "Remote service cannot be null");
 		

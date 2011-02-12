@@ -59,7 +59,7 @@ extends AbstractRemoteServiceManager<T> {
 	preMethodMapByService;
 	
 	@SuppressWarnings("unchecked")
-	public DefaultRemoteServiceManager(T... remoteServices) {
+	public <T2 extends T> DefaultRemoteServiceManager(T2... remoteServices) {
 		super(remoteServices);
 		
 		HashMap<Byte, T> map = new HashMap<Byte, T>();
