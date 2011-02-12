@@ -31,12 +31,51 @@ import org.sglj.service.rmi.RemoteCallException;
 import org.sglj.service.rmi.RemoteCallResult;
 import org.sglj.service.rmi.RemoteService;
 
-
 /**
  * Base class for implementing stub services on the calling side (usually
  * client). Provides wrapper type-safe methods that return the method's
  * return type. If there is an exception on the executing side (usually server),
- * every method in the service will throw the {@link RemoteCallException}. 
+ * every method in the service will throw the {@link RemoteCallException}.<br>
+ * Note that this abstract implementation, unlike 
+ * {@link SafeRemoteServiceStub}, does not check whether
+ * the method can actually be called, so it is in a certain way "unsafe".<br>
+ * Here is the usage example:
+ * 
+<pre>
+// common interface for the calling and executing side
+public interface ExampleService extends RemoteService {
+	int calcSum(int a, int b) throws RemoteCallException;
+	String sayHello(String a) throws RemoteCallException;
+}
+
+...
+
+public class ExampleServiceStub extends
+RemoteServiceStub&lt;ExampleService&gt; implements ExampleService {
+
+	public ExampleServiceStub(RemoteCallRequestSender requestSender) {
+		super(requestSender);
+	}
+
+	&#064;RemoteMethod(RemoteMethodSide.CALLER)
+	&#064;Override
+	public int calcSum(int a, int b) throws RemoteCallException {
+		return callSynchronously(&quot;calcSum&quot;, a, b);
+	}
+
+	&#064;RemoteMethod(RemoteMethodSide.CALLER)
+	&#064;Override
+	public String sayHello(String a) throws RemoteCallException {
+		return callSynchronously(&quot;sayHello&quot;, a);
+	}
+
+	&#064;Override
+	public byte getId() {
+		return ExampleService.ID;
+	}
+
+}
+</pre> 
  * 
  * @author Leo Osvald
  *
@@ -45,10 +84,23 @@ import org.sglj.service.rmi.RemoteService;
 public abstract class RemoteServiceStub<T extends RemoteService>
 implements RemoteService {
 
-	private final Caller caller;
+	private final RemoteServiceCaller<T> caller;
 	
+	/**
+	 * Creates a stub which delegate calls to the corresponding
+	 * request sender in an unsafe way (without checking whether the
+	 * methods can actually be called on the server or whether they exist
+	 * at all).
+	 * 
+	 * @param requestSender the request sender to which method calls
+	 * should be delegated
+	 */
 	public RemoteServiceStub(RemoteCallRequestSender requestSender) {
 		caller = new Caller(requestSender);
+	}
+	
+	protected RemoteServiceStub(RemoteServiceCaller<T> caller) {
+		this.caller = caller;
 	}
 	
 	protected <R> R callSynchronously(String methodName, Object... args) 
@@ -77,12 +129,10 @@ implements RemoteService {
 		return caller;
 	}
 	
-	private class Caller extends AbstractRemoteServiceCaller<T> {
+	private final class Caller extends AbstractRemoteServiceCaller<T> {
 
-		@SuppressWarnings("unchecked")
 		public Caller(RemoteCallRequestSender requestSender) {
-			super((T) RemoteServiceStub.this, requestSender);
-			// TODO Auto-generated constructor stub
+			super(requestSender);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -93,8 +143,7 @@ implements RemoteService {
 		
 	}
 	
-	
-	private static class ReturnValueFuture<R> implements Future<R> {
+	private static final class ReturnValueFuture<R> implements Future<R> {
 
 		private final Future<RemoteCallResult> resultFuture;
 		
@@ -113,7 +162,7 @@ implements RemoteService {
 			try {
 				RemoteCallResult res = resultFuture.get();
 				if (res.isError())
-					throw new RemoteCallException(res.getError());
+					throw new RemoteCallException(res.getError().byteValue());
 				return (R) res.getReturnValue();
 			} catch (ExecutionException e) {
 				e.printStackTrace();
@@ -128,7 +177,7 @@ implements RemoteService {
 				ExecutionException, TimeoutException {
 			RemoteCallResult res = resultFuture.get(timeout, unit);
 			if (res.isError())
-				throw new RemoteCallException(res.getError());
+				throw new RemoteCallException(res.getError().byteValue());
 			return (R) res.getReturnValue();
 		}
 

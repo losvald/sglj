@@ -22,6 +22,7 @@
 package org.sglj.service.rmi.server;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -152,6 +153,15 @@ implements RemoteServiceExecutor<S, T> {
 	public RemoteCallResult executeServiceMethod(T callerInfo,
 			String methodName, Object... args) {
 		return executeServiceMethod(callerInfo, getService(), methodName, args);
+	}
+	
+	@Override
+	public Collection<Method> getCallableMethods(byte serviceId) {
+		return remoteMethods;
+	}
+	
+	public Method getMatchingMethod(S service, String methodName, Class<?> params) {
+		return null;
 	}
 	
 }

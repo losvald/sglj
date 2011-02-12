@@ -22,6 +22,8 @@
 package org.sglj.service.rmi.server;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.sglj.service.rmi.RemoteService;
 import org.sglj.service.rmi.RemoteServiceManager;
@@ -36,12 +38,12 @@ import org.sglj.service.rmi.RemoteServiceManager;
  */
 public class RemoteCallExecutorService<T extends RemoteCallerInfo>
 extends AbstractRemoteCallExecutor<RemoteService, T> {
-
-	private final RemoteServiceManager<RemoteServiceExecutor<?, T>> manager;
+	private final RemoteServiceManager<RemoteServiceExecutor<RemoteService, T>> manager;
 	
+	@SuppressWarnings("unchecked")
 	public RemoteCallExecutorService(
-			RemoteServiceManager<RemoteServiceExecutor<?, T>> serviceManager) {
-		this.manager = serviceManager;
+			RemoteServiceManager<? extends RemoteServiceExecutor<?, T>> serviceManager) {
+		this.manager = (RemoteServiceManager<RemoteServiceExecutor<RemoteService, T>>) serviceManager;
 	}
 	
 	public RemoteServiceExecutor<?, T> getRemoteServiceExecutor(byte serviceId) {
@@ -72,8 +74,16 @@ extends AbstractRemoteCallExecutor<RemoteService, T> {
 	}
 	
 	@Override
-	protected RemoteServiceExecutor<?, T> getRemoteService(byte serviceId) {
+	protected RemoteServiceExecutor<RemoteService, T> getRemoteService(byte serviceId) {
 		return manager.getService(serviceId);
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Collection<Method> getCallableMethods(byte serviceId) {
+		RemoteServiceExecutor<RemoteService, T> executor = getRemoteService(serviceId);
+		if (executor == null)
+			return Collections.EMPTY_LIST;
+		return executor.getCallableMethods(serviceId);
+	}
 }

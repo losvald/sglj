@@ -24,11 +24,11 @@ package org.sglj.service.rmi.server;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.apache.commons.lang.reflect.MethodUtils;
 import org.sglj.service.rmi.BasicRemoteServiceErrors;
 import org.sglj.service.rmi.RemoteCallException;
 import org.sglj.service.rmi.RemoteCallRequest;
 import org.sglj.service.rmi.RemoteCallResult;
+import org.sglj.service.rmi.RmiUtils;
 import org.sglj.service.rmi.RemoteService;
 
 
@@ -89,8 +89,9 @@ implements RemoteCallExecutor<S, T> {
 			paramTypes[i] = (args[i] != null ? args[i].getClass() : null);
 		
 		try {
-			Method m = MethodUtils.getMatchingAccessibleMethod(
-					service.getClass(), methodName, paramTypes);
+			Method m = RmiUtils.getMatchingAccessibleMethod(
+					service.getClass(), methodName, paramTypes,
+					getCallableMethods(service.getId()));
 			boolean anonymously = true;
 			if (callerInfo != null) {
 				setCallerInfo(service, callerInfo);
@@ -162,5 +163,4 @@ implements RemoteCallExecutor<S, T> {
 	 * one or <code>null</code> if none is.
 	 */
 	protected abstract S getRemoteService(byte serviceId);
-
 }

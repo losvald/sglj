@@ -30,7 +30,8 @@ import org.sglj.service.rmi.RemoteCallResult;
 /**
  * Classes that implement this interface are responsible for sending
  * a {@link RemoteCallRequest} from the calling side 
- * through the network to the executing side.
+ * through the network to the executing side. This is usually a TCP or UDP
+ * client.
  * 
  * @author Leo Osvald
  * @version 1.0

@@ -29,17 +29,36 @@ import org.sglj.service.rmi.ServiceReflectionCallException;
 
 
 /**
- * TODO
+ * A delegator which delegates method calls to the
  * 
  * @author Leo Osvald
  *
  */
 public interface RemoteServiceCaller<S extends RemoteService> {
 	
+	/**
+	 * Calls the
+	 * @param methodName
+	 * @param args
+	 * @return
+	 * @throws ServiceReflectionCallException
+	 */
 	Future<RemoteCallResult> callServiceMethod(String methodName, Object... args)
 	throws ServiceReflectionCallException; 
 	
+	/**
+	 * Returns the remote service for which this caller is responsible for 
+	 * (i.e. whose methods can be called through this caller).
+	 * 
+	 * @return the corresponding remote service 
+	 */
 	S getService();
 	
+	/**
+	 * Returns the request sender to which calls are delegated when
+	 * the {@link #callServiceMethod(String, Object...)} is called.
+	 * 
+	 * @return a request sender
+	 */
 	RemoteCallRequestSender getRequestSender();
 }

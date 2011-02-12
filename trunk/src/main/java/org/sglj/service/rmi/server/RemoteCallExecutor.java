@@ -22,6 +22,7 @@
 package org.sglj.service.rmi.server;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 
 import org.sglj.service.rmi.BasicRemoteServiceErrors;
 import org.sglj.service.rmi.RemoteCallRequest;
@@ -158,4 +159,12 @@ T extends RemoteCallerInfo> {
 	 */
 	void setCallerInfo(S service, T callerInfo);
 	
+	/**
+	 * Returns the collection of methods which belong to 
+	 * the specified remote service and can be called remotely,
+	 * 
+	 * @param serviceId the identifier of the service
+	 * @return immutable collection of methods which can be called remotely
+	 */
+	Collection<Method> getCallableMethods(byte serviceId);
 }
