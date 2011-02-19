@@ -1,5 +1,5 @@
 /*
- * Queryable.java
+ * GlobalQueryable.java
  * 
  * Copyright (C) 2010 Leo Osvald <leo.osvald@gmail.com>
  * 
@@ -21,14 +21,20 @@
 
 package org.sglj.util.struct;
 
-public interface Queryable<T> {
+/**
+ * A {@link Queryable} which provides global queries through the
+ * {@link #query()} method.
+ * 
+ * @author Leo Osvald
+ *
+ * @param <T> the type of global query result
+ */
+public interface GlobalQueryable<T> extends Queryable<T> {
 	
 	/**
-	 * Creates a new data of the type of the query result.
-	 * This method is used for initialization purposes in classes
-	 * implementing this interface (or other interfaces extending this one).
+	 * Returns the result of a global query.
 	 * 
-	 * @return data
+	 * @return the result
 	 */
-	T createQueryData();
+	T query();
 }
