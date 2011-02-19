@@ -220,7 +220,8 @@ Cloneable, Serializable {
 
 	@Override
 	public Iterator<E> iterator() {
-		return queue.iterator();
+		// disable remove() operation of the underlying queue's iterator
+		return new NoRemoveItr<E>(queue.iterator());
 	}
 
 	@Override
@@ -454,6 +455,30 @@ Cloneable, Serializable {
     		fixAfterPushAllComparator(this);
     	else
     		fixAfterPushAllComparable(this);
+    }
+    
+    private static final class NoRemoveItr<E> implements Iterator<E> {
+
+    	final Iterator<E> it;
+    	
+		NoRemoveItr(Iterator<E> it) {
+			this.it = it;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return it.hasNext();
+		}
+
+		@Override
+		public E next() {
+			return it.next();
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
     }
 	
 }
