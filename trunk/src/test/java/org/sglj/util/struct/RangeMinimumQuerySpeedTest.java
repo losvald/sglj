@@ -3,7 +3,6 @@ package org.sglj.util.struct;
 import java.util.Random;
 
 import org.junit.Test;
-import org.sglj.util.struct.RangeMinimumQuery;
 
 
 public class RangeMinimumQuerySpeedTest {

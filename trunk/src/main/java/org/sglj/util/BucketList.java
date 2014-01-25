@@ -60,7 +60,8 @@ implements RandomAccess {
 		// [9, 33) -> 3
 		// [2^(n-1)+1, 2^(n+1)+1] -> n
 		--numElements;
-		bucketSizeLog = (log2(numElements) >>> 1);
+		// set bucketSize to sqrt(floor(log2(numElements))  
+		bucketSizeLog = ((31 - Integer.numberOfLeadingZeros(numElements)) >>> 1);
 		
 		// determine the number of buckets
 		b = new RandomAccessDeque[2 << bucketSizeLog];
@@ -166,14 +167,6 @@ implements RandomAccess {
 	
 	protected int getBufferSize() {
 		return 1 << bucketSizeLog;
-	}
-	
-	private static int log2(int v) {
-		int r = 0;
-		do {
-			++r;
-		} while ((v >>>= 1) != 0);
-		return r;
 	}
 	
 	@Override
