@@ -28,10 +28,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+import java.util.TreeSet;
 
 import org.junit.Test;
 import org.sglj.util.struct.AvlTree.AvlNode;
@@ -82,21 +82,9 @@ public class AvlTreeTest {
 		}
 	}
 
-	static class NonAugmentedAvlTreeTest {
-	}
+	static class VerifiedAvlTree extends AvlTree<Integer> {
+		TreeSet<Integer> treeSet = new TreeSet<Integer>();
 
-	static abstract class AbstractVerifiedAvlTree extends AvlTree<Integer> {
-		public AbstractVerifiedAvlTree() {
-			super(new Comparator<Integer>() {
-				@Override
-				public int compare(Integer o1, Integer o2) {
-					return o1.compareTo(o2);
-				}
-			});
-		}
-	}
-
-	static class VerifiedAvlTree extends AbstractVerifiedAvlTree {
 		@Override
 		protected Node createNode(Integer key) {
 			return new Node(key);
@@ -117,6 +105,7 @@ public class AvlTreeTest {
 			else if (heightDiff < -1)
 				fail("Insertion cannot decrease height by >1");
 			assertHeightInvariant();
+			assertEquals(treeSet.add(e), ret);
 			return ret;
 		}
 
@@ -130,6 +119,19 @@ public class AvlTreeTest {
 			else if (heightDiff > 1)
 				fail("Removal cannot increase height by >1");
 			assertHeightInvariant();
+			assertEquals(treeSet.remove(o), ret);
+			return ret;
+		}
+
+		@Override
+		public String toString() {
+			String ret = super.toString();
+			String exp = treeSet.toString();
+			boolean ok = ret.equals(exp);
+			if (!ok) {
+				System.out.println("failed toString():\n" + repr(this));
+				assertEquals(exp, ret);
+			}
 			return ret;
 		}
 
@@ -341,32 +343,6 @@ public class AvlTreeTest {
 		assertEquals(0, vat.getRoot().heightMin);
 	}
 
-	private static void permute(String prefix, String str, List<int[]> perms) {
-	    int n = str.length();
-	    if (n == 0) {
-	    	int[] a = new int[prefix.length()];
-	    	for (int i = 0; i < a.length; ++i)
-	    		a[i] = prefix.charAt(i) - '0';
-	    	perms.add(a);
-	    }
-	    else {
-	        for (int i = 0; i < n; i++)
-	            permute(prefix + str.charAt(i),
-	            		str.substring(0, i) + str.substring(i+1, n),
-	            		perms);
-	    }
-	}
-
-	static List<int[]> permute(int maxN) {
-		List<int[]> perms = new ArrayList<int[]>();
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i <= maxN; ++i) {
-			sb.append((char)('0' + i));
-			permute("", sb.toString(), perms);
-		}
-		return perms;
-	}
-
 	@Test
 	public void testRotateLeft() {
 		VerifiedAvlTree vat = new VerifiedAvlTree();
@@ -428,6 +404,47 @@ public class AvlTreeTest {
 		assertRepr(vat, "([4] <([2] <([1] <() >()) >([3] <() >())) >([7] <([6] <() >()) >([8] <() >())))");
 	}
 
+	private static void permute(String prefix, String str, List<int[]> perms) {
+	    int n = str.length();
+	    if (n == 0) {
+	    	int[] a = new int[prefix.length()];
+	    	for (int i = 0; i < a.length; ++i)
+	    		a[i] = prefix.charAt(i) - '0';
+	    	perms.add(a);
+	    }
+	    else {
+	        for (int i = 0; i < n; i++)
+	            permute(prefix + str.charAt(i),
+	            		str.substring(0, i) + str.substring(i+1, n),
+	            		perms);
+	    }
+	}
+
+	static List<int[]> permute(int maxN) {
+		List<int[]> perms = new ArrayList<int[]>();
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i <= maxN; ++i) {
+			sb.append((char)('0' + i));
+			permute("", sb.toString(), perms);
+		}
+		return perms;
+	}
+
+	@Test
+	public void testSearchAllPermutations() {
+		final int n = 6;
+		for (int[] keys : permute(n)) {
+			VerifiedAvlTree vat = new VerifiedAvlTree();
+			boolean[] contained = new boolean[n + 1];
+			for (int key : keys) {
+				vat.add(key);
+				contained[key] = true;
+			}
+			for (int key = 0; key < n; ++key)
+				assertEquals(contained[key], vat.contains(key));
+		}
+	}
+
 	@Test
 	public void testInsertAllPermutations() {
 		for (int[] keys : permute(7)) {
@@ -447,6 +464,38 @@ public class AvlTreeTest {
 					vat.add(key);
 				vat.remove(toRemove);
 			}
+		}
+	}
+
+	@Test
+	public void testStressRandom() {
+		final int sizeAvg = 100;
+		final int coordMax = 400;
+		final Random r = new Random();
+		VerifiedAvlTree vat = new VerifiedAvlTree();
+
+		for (int itr = 0; itr < 10000; ++itr) {
+			boolean add;
+			int sizeDiff = vat.size() - sizeAvg;
+			if (sizeDiff >= 10)
+				add = false;
+			else if (sizeDiff < -10)
+				add = true;
+			else
+				add = r.nextBoolean();
+			if (add) {
+				int x = r.nextInt(coordMax);
+				//System.out.println("+ " + x);
+				vat.add(x);
+			} else {
+				int x;
+				do {
+					x = r.nextInt(coordMax);
+				} while (!vat.remove(x));
+				//System.out.println("- " + x);
+			}
+
+			vat.toString();
 		}
 	}
 }

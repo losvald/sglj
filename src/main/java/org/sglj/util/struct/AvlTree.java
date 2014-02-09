@@ -34,12 +34,7 @@ import org.sglj.util.ref.IntReference;
 
 
 public abstract class AvlTree<E> extends AbstractSet<E> {
-	private AvlNode<E> root;
-
-	private Comparator<Object> comparator;
-	private int size;
-
-	private static Comparator<Object> minComparator = new Comparator<Object>() {
+	protected static final Comparator<Object> minComparator = new Comparator<Object>() {
 		@SuppressWarnings("unchecked")
 		@Override
 		public int compare(Object o1, Object o2) {
@@ -47,15 +42,26 @@ public abstract class AvlTree<E> extends AbstractSet<E> {
 		}
 	};
 
-	protected static class InsertResult<E> extends IntReference {
-		public AvlNode<E> inserted;
+	private Comparator<Object> comparator;
 
-		public InsertResult() {
-			super(0);
-		}
+	private int size;
+	private AvlNode<E> root;
+
+	public AvlTree() {
+		this(new Comparator<E>() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public int compare(E o1, E o2) {
+				return ((Comparable<E>)o1).compareTo(o2);
+			}
+		});
 	}
 
-	public AvlTree(final Comparator<? super E> comparator) {
+	public AvlTree(Comparator<? super E> comparator) {
+		setComparator(comparator);
+	}
+
+	protected void setComparator(final Comparator<? super E> comparator) {
 		this.comparator = new Comparator<Object>() {
 			@SuppressWarnings("unchecked")
 			@Override
@@ -65,7 +71,19 @@ public abstract class AvlTree<E> extends AbstractSet<E> {
 		};
 	}
 
+	protected Comparator<Object> getComparator() {
+		return comparator;
+	}
+
 	protected abstract AvlNode<E> createNode(E item);
+
+	protected static class InsertResult<E> extends IntReference {
+		public AvlNode<E> inserted;
+
+		public InsertResult() {
+			super(0);
+		}
+	}
 
 	public void insert(E item, InsertResult<E> result) {
 		root = insert(root, item, result);
@@ -73,31 +91,32 @@ public abstract class AvlTree<E> extends AbstractSet<E> {
 			++size;
 	}
 
-	private AvlNode<E> insert(AvlNode<E> root, E item, InsertResult<E> result) {
-		// See if the tree is empty
+	private AvlNode<E> insert(AvlNode<E> root, E key, InsertResult<E> result) {
 		if (root == null) {
-			// Insert new node here
+			// insert a new node
 			result.value = 1;
-			return result.inserted = createNode(item);
+			(result.inserted = createNode(key)).incrementMultiplicity(key);
+			return result.inserted;
 		}
 
 		// Compare items and determine which direction to search
-		int cmp = root.compareKey(item, comparator);
+		int cmp = root.compareKey(key, comparator);
 		if (cmp == 0) {
 			// key already in tree at this node
+			root.incrementMultiplicity(key);
 			result.value = 0;
 			result.inserted = null;
 			return root;
 		}
 
-		// Insert into "dir" subtree
+		// Insert into left/right subtree
 		if (cmp < 0)
-			root.left = insert(root.left, item, result);
+			root.left = insert(root.left, key, result);
 		else
-			root.right = insert(root.right, item, result);
+			root.right = insert(root.right, key, result);
 
 		if (result.inserted != null) {
-			// re-balance if needed -- height of current tree increases only if its
+			// rebalance if needed -- height of current tree increases only if its
 			// subtree height increases and the current tree needs no rotation.
 			if (result.value != 0 && (root.myBal += cmp < 0 ? -1 : 1) != 0) {
 				root = root.rebalance(result);
@@ -120,6 +139,7 @@ public abstract class AvlTree<E> extends AbstractSet<E> {
 	}
 
 	public void remove(E key, RemoveResult<E> result) {
+		result.removed = null;
 		root = AvlNode.remove(root, key, comparator, result);
 		if (result.removed != null)
 			--size;
@@ -137,6 +157,12 @@ public abstract class AvlTree<E> extends AbstractSet<E> {
 	@Override
 	public Iterator<E> iterator() {
 		return new AvlIterator();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean contains(Object o) {
+		return AvlNode.search(root, (E)o, comparator) != null;
 	}
 
 	@Override
@@ -174,6 +200,12 @@ public abstract class AvlTree<E> extends AbstractSet<E> {
 		for (Object item : c)
 			remove((E)item, result);
 		return size() != oldSize;
+	}
+
+	@Override
+	public void clear() {
+		size = 0;
+		root = null;
 	}
 
 	protected static abstract class AvlNode<K> implements
@@ -226,14 +258,14 @@ public abstract class AvlTree<E> extends AbstractSet<E> {
 			AvlNode<K> oldRoot = root;
 			AvlNode<K> oldOtherDirSubtree = root.right;
 
-			// assign new root
+			// assign a new root
 			root = oldRoot.right.left;
 
-			// new-root exchanges it's "dir" subtree for it's grandparent
+			// new root exchanges its left subtree for its grandparent
 			oldRoot.right = root.left;
 			root.left = oldRoot;
 
-			// new-root exchanges it's "other-dir" subtree for it's parent
+			// new root exchanges its right subtree for its parent
 			oldOtherDirSubtree.left = root.right;
 			root.right = oldOtherDirSubtree;
 
@@ -252,14 +284,14 @@ public abstract class AvlTree<E> extends AbstractSet<E> {
 			AvlNode<K> oldRoot = root;
 			AvlNode<K> oldOtherDirSubtree = root.left;
 
-			// assign new root
+			// assign a new root
 			root = oldRoot.left.right;
 
-			// new-root exchanges it's "dir" subtree for it's grandparent
+			// the new root exchanges its right subtree for its grandparent
 			oldRoot.left = root.right;
 			root.right = oldRoot;
 
-			// new-root exchanges it's "other-dir" subtree for it's parent
+			// the new root exchanges its left subtree for its parent
 			oldOtherDirSubtree.right = root.left;
 			root.left = oldOtherDirSubtree;
 
@@ -279,7 +311,7 @@ public abstract class AvlTree<E> extends AbstractSet<E> {
 			root.right.myBal = -Math.min(root.myBal, 0);
 			root.myBal = 0;
 
-			// A double rotation always shortens the overall height of the tree
+			// a double rotation always shortens the overall height of the tree
 			return 1;
 		}
 
@@ -325,11 +357,24 @@ public abstract class AvlTree<E> extends AbstractSet<E> {
 			return left.myBal == 1;
 		}
 
-		private static <K> AvlNode<K> remove(AvlNode<K> root, K key,
+		public static <K> AvlNode<K> search(AvlNode<K> root, K key,
+				Comparator<Object> comparator) {
+			while (root != null) {
+				int cmp = root.compareKey(key, comparator);
+				if (cmp == 0)
+					break;
+				else if (cmp < 0)
+					root = root.left;
+				else
+					root = root.right;
+			}
+			return root;
+		}
+
+		public static <K> AvlNode<K> remove(AvlNode<K> root, K key,
 				Comparator<Object> comparator, RemoveResult<K> result) {
 			if (root == null) {
 				// Key not found
-				result.removed = null;
 				result.value = 0;
 				return root;
 			}
@@ -344,6 +389,11 @@ public abstract class AvlTree<E> extends AbstractSet<E> {
 				root.right = remove(root.right, key, comparator, result);
 				decrease = result.value;
 			} else  {   // Found key at this node
+				if (result.removed == null && !root.decrementMultiplicity(key)) {
+					result.value = 0;
+					return root;
+				}
+
 				// At this point, we know "result" is zero and "root" points to
 				// the node that we need to delete.  There are three cases:
 				//
@@ -381,6 +431,7 @@ public abstract class AvlTree<E> extends AbstractSet<E> {
 					// We have two children -- find successor and replace our
 					// current data item with that of the successor
 					int heightChange = result.value;
+					result.removed = root;
 					AvlNode<K> right = remove(root.right, key, minComparator,
 							result);
 					AvlNode<K> succ = result.removed;
@@ -393,14 +444,13 @@ public abstract class AvlTree<E> extends AbstractSet<E> {
 				}
 			}
 
-			root.myBal -= decrease; // update balance factor
-
 			// Rebalance if necessary -- the height of current tree changes if:
 			// (1) a rotation that was performed changed the subtree height
 			// (2) the decreased subtree height now matches the sibling's height
 			// (now, the current has a zero balance when it previously did not).
 			if (decrease != 0) {
-				if (root.myBal != 0) { // rebalance and see if height changed
+				// update balance factor and rebalance if the height changed
+				if ((root.myBal -= decrease) != 0) {
 					root = root.rebalance(result);
 				} else {
 					result.value = 1;  // balanced because subtree decreased
@@ -412,6 +462,13 @@ public abstract class AvlTree<E> extends AbstractSet<E> {
 			root.mergeCodomains(root.left, root.right);
 
 			return root;
+		}
+
+		public void incrementMultiplicity(K key) {
+		}
+
+		public boolean decrementMultiplicity(K key) {
+			return true;
 		}
 	}
 
